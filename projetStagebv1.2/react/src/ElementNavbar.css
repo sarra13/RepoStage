@@ -1,0 +1,59 @@
+
+  .side{
+    height: 100;
+    position: fixed; /* Set the navbar to fixed position */
+    background-color:orangered;
+  }
+  .btnSarra{
+
+border:none;
+padding: 0 0 0 0;
+  width: 98%;
+  font:bold 14px Arial;
+  color:#555;
+  justify-content: center;
+  cursor: pointer;
+  } 
+  
+  .fixed:hover{
+      background-attachment: fixed;
+      background:tan;
+  }
+  .fa-search:hover{
+    transform: scale(1.5);
+  }
+  .fa-cogs:hover{
+    transform: scale(1.5);
+
+  }
+  .fa-user:hover{
+    transform: scale(1.5);
+  }
+  .fa-unlock:hover{
+    transform: scale(1.5);
+
+  }
+  .fa-lock:hover{
+    transform: scale(1.5);
+
+  }
+.fa-home:hover{
+  transform: scale(1.5);
+
+}
+.fa-check:hover{
+  transform: scale(1.5);
+
+}
+.fa-globe:hover{
+  transform: scale(1.5);
+
+}
+.fa-medkit:hover{
+  transform: scale(1.5);
+
+}
+.fa-power-off:hover{
+  transform: scale(1.5);
+
+}

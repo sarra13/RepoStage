@@ -1,0 +1,109 @@
+
+form {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+}
+.login-container{
+  margin-top: 5%;
+  margin-bottom: 5%;
+  margin:0 auto;
+
+}
+.login-form-1{
+  padding: 5%;
+  box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2), 0 9px 26px 0 rgba(0, 0, 0, 0.19);
+  margin:0 auto;
+
+
+}
+.login-form-1 h3{
+  text-align: center;
+  color: #333;
+  margin:0 auto;
+
+}
+.login-form-2{
+  padding: 5%;
+  background: #0062cc;
+  box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2), 0 9px 26px 0 rgba(0, 0, 0, 0.19);
+  margin:0 auto;
+
+}
+.login-form-2 h3{
+  text-align: center;
+  color: #fff;
+}
+.login-container form{
+  padding: 10%;
+  margin:0 auto;
+
+
+}
+label {
+  font-size: 0.8em;
+  margin-bottom: 0.25em;
+  font-weight: lighter;
+  color: orangered;
+
+}
+
+input {
+  padding: 10px 10px;
+  border-radius: 5px;
+  outline: none;
+  border: 1px solid #cfcfcf;
+}
+.NomEtudiant{
+  margin-right: 1%;
+}
+
+.PrenomEtudiant { 
+   margin-left: 1%;
+}
+
+.NomTuteur{
+  margin-right: 1%;
+}
+
+.PrenomTuteur { 
+   margin-left: 1%;
+}
+  .NomEtudiant,
+  .PrenomEtudiant,
+  .NomTuteur,
+  .PrenomTuteur,
+  .TelTuteur,
+  .TelEtudiant,
+  .Date{
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+
+  }
+  
+  .NomEtudiant,
+  .PrenomEtudiant {
+    width: 49%;
+    
+  
+  }
+  .TelEtudiant{
+    width:100%;
+  }
+  .TelTuteur{
+    width:100%
+  }
+  .Date{
+    width:100%
+  }
+  .NomTuteur,
+  .PrenomTuteur{
+    width: 49%;
+  }
+  
+ 
+  h1{
+    color: orangered;
+    font-weight: bolder;
+  }
