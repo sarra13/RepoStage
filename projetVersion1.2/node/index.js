@@ -313,7 +313,7 @@ con.query(requette, function (err, result, fields) {
 
 app.get('/stages/updateStagePourEtudiant',(req,res)=>{
 
-	requette = ` UPDATE relationetudiantstages SET numIDStage= `+req.query.numIDStage+`,nomResponsable = '`+req.query.nomResponsable+`,nomMaitreDeStage1 = '`+req.query.nomMaitreDeStage1+`',nomMaitreDeStage2 = '`+req.query.nomMaitreDeStage2+`' ,datedebut = '`+req.query.datedebut+`' , datefin = '`+req.query.datefin+`' ,numIDTerrain = '`+req.query.numIDTerrain+`
+	requette = ` UPDATE relationetudiantstages SET numIDStage= `+req.query.numIDStage+`,nomResponsable = '`+req.query.nomResponsable+`',nomMaitreDeStage1 = '`+req.query.nomMaitreDeStage1+`',nomMaitreDeStage2 = '`+req.query.nomMaitreDeStage2+`' ,datedebut = '`+req.query.datedebut+`' , datefin = '`+req.query.datefin+`' ,numIDTerrain = '`+req.query.numIDTerrain+`'
 	WHERE relationetudiantstages.Semestre = `+req.query.Semestre+`
 	and relationetudiantstages.DES = `+req.query.DES+`
 	  and relationetudiantstages.numetu =`+req.query.numetu  ;

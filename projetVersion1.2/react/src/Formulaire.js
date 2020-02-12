@@ -89,7 +89,7 @@ toggleModalSuccesEnvoi = () => {
       handleTerrainChange = (e , index) => {
         var data1 = this.state.Terrains ;
       
-       this.state. value= e.target.value ;
+       this.state. value1= e.target.value ;
         this.setState({
               Terrains : data1
         })
@@ -422,7 +422,7 @@ else
             <div className="Terrain">
               <label htmlFor="Terrain">Terrain de stage hospitalier:</label>
 
-              <select className="browser-default custom-select" value={this.state.value1} onChange={this.handleTerrainChange} >
+              <select className="browser-default custom-select" value1={this.state.value1} onChange={this.handleTerrainChange} >
                 {this.state.Terrains.map((terrain,index) =>(
                     
                   <option key={terrain.idterrain} value={terrain.idterrain}>{terrain.nom}</option>
