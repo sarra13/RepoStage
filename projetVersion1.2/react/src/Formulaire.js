@@ -16,7 +16,6 @@ const initialState={
 };
 const re = /^[0-9\b]+$/;
 const re1 = /^[0-9\b]/;
-
 class Formulaire extends Component {
   constructor(props) {
     super(props);
@@ -27,6 +26,8 @@ class Formulaire extends Component {
       TuteursOptions:"",
       error:false,
       Responsable: "",
+      MaitreDeStage:"",
+      MaitreDe:"",
       maxDate:"",
       minDate:"",
       startDate: new Date(),
@@ -34,6 +35,10 @@ class Formulaire extends Component {
       endDate:new Date(),
       endDateValueToDB:"",
       numResponsable : "" ,
+      numMaitreDe:"",
+      numMaitreDeStage:"",
+      numMaitreDeSelection:"",
+      numMaitreDeStageSelection:"",
       numResponsableSelection : "" ,
       stages:  [
               { id: '1',DES :"1" , sujet: "Stage d'urgences "},
@@ -48,8 +53,16 @@ class Formulaire extends Component {
 
 
            ],
+      Terrains:[
+        
+          {idterrain:'1',nom:"Urgences SMUR , CH BRIVE"},
+          {idterrain:'2',nom:"Urgences SMUR , CH d'USSEL"},
+
+        
+      ] ,    
        datareceived:"",
       modal: false,
+       value1:0,
        value:0,
       
      }
@@ -73,6 +86,16 @@ toggleModalSuccesEnvoi = () => {
       
       }  
 
+      handleTerrainChange = (e , index) => {
+        var data1 = this.state.Terrains ;
+      
+       this.state. value= e.target.value ;
+        this.setState({
+              Terrains : data1
+        })
+        
+        }  
+
     handleResponsableChange = selectedOption => {
 
             this.setState({
@@ -81,6 +104,22 @@ toggleModalSuccesEnvoi = () => {
             }) 
             console.log(selectedOption) 
       }
+      handleMaitreDeStageChange = selectedOption => {
+
+        this.setState({
+          numMaitreDeStage : selectedOption.value ,
+          numMaitreDeStageSelection : selectedOption 
+        }) 
+        console.log(selectedOption) 
+  }
+  handleMaitreDeChange = selectedOption => {
+
+    this.setState({
+      numMaitreDe: selectedOption.value ,
+      numMaitreDeSelection : selectedOption 
+    }) 
+    console.log(selectedOption) 
+}
 
   handleDateDebutChange = date => {
     this.setState({
@@ -131,7 +170,7 @@ toggleModalSuccesEnvoi = () => {
    this.setState(initialState)
 
        
-   axios.get("/stages/updateStagePourEtudiant?numetu="+this.props.numEtu+"&DES="+this.props.choixdes+"&Semestre="+this.props.choixsem+"&numIDStage="+this.state.value+ "&nomResponsable="+this.state.numResponsable +" &datedebut="+this.state.startDateValueToDB+ "&datefin="+this.state.endDateValueToDB)
+   axios.get("/stages/updateStagePourEtudiant?numetu="+this.props.numEtu+"&DES="+this.props.choixdes+"&Semestre="+this.props.choixsem+"&numIDStage="+this.state.value+"&numIDTerrain="+this.state.value1+"&nomMaitreDeStage1="+this.state.numMaitreDeStage+"&nomMaitreDeStage2="+this.state.numMaitreDe+ "&nomResponsable="+this.state.numResponsable +" &datedebut="+this.state.startDateValueToDB+ "&datefin="+this.state.endDateValueToDB)
 
     this.toggleModalSuccesEnvoi();
 
@@ -158,8 +197,13 @@ toggleModalSuccesEnvoi = () => {
        
        this.setState({
           value:datareceived.numIDStage,
+          value1:datareceived.numIDTerrain,
           numResponsable:datareceived.nomResponsable,
+          numMaitreDeStage:datareceived.nomMaitreDeStage1,
+          numMaitreDe:datareceived.nomMaitreDeStage2,
           numResponsableSelection:"",
+          numMaitreDeSelection:"",
+          numMaitreDeStageSelection:"",
           startDate:new Date(datareceived.datedebut),
           endDate:new Date(datareceived.datefin),
           startDateValueToDB:(new Date(datareceived.datedebut).getYear()+1900)+"-"+ (new Date(datareceived.datedebut).getMonth() +1)+"-"+new Date(datareceived.datedebut).getDate(),
@@ -188,11 +232,53 @@ toggleModalSuccesEnvoi = () => {
               })
            })
 
+           axios.get("/getAllTuteurs")
+           .then(response2 => {
+             this.setState({
+               TuteursOptions:response2.data,
+             })
+             var found = false;
+          response2.data.forEach(element =>{
+            if(parseInt(datareceived.nomMaitreDeStage1,10)==parseInt(element.value,10)){
+              found = true;
+               this.setState({
+                  numMaitreDeStageSelection: element
+               })                  
+            }
+            if (!found){ this.setState({
+                                numMaitreDeStageSelection: "Choisir1",
+                                numMaitreDeStage: "0"
+                                    })   
+                        }
+          })
+       })
+
+       axios.get("/getAllTuteurs")
+       .then(response2 => {
+         this.setState({
+           TuteursOptions:response2.data,
+         })
+         var found = false;
+      response2.data.forEach(element =>{
+        if(parseInt(datareceived.nomMaitreDeStage2,10)==parseInt(element.value,10)){
+          found = true;
+           this.setState({
+              numMaitreDeSelection: element
+           })                  
+        }
+        if (!found){ this.setState({
+                            numMaitreDeSelection: "Choisir2",
+                            numMaitreDe: "0"
+                                })   
+                    }
+      })
+   })
 
       }
      })  
  }
 };
+
 
 componentWillReceiveProps(newProps) {
 
@@ -210,7 +296,10 @@ componentWillReceiveProps(newProps) {
 
               this.setState({
                 value:datareceived.numIDStage,
+                value1:datareceived.numIDTerrain,
                 Responsable:datareceived.nomResponsable,
+                MaitreDeStage:datareceived.nomMaitreDeStage1,
+                MaitreDe:datareceived.nomMaitreDeStage2,
                 startDate:new Date(datareceived.datedebut),
                 endDate:new Date(datareceived.datefin),
                 startDateValueToDB:(new Date(datareceived.datedebut).getYear()+1900)+"-"+ (new Date(datareceived.datedebut).getMonth() +1)+"-"+new Date(datareceived.datedebut).getDate(),
@@ -239,7 +328,59 @@ componentWillReceiveProps(newProps) {
 
                   })
                })
+
+               axios.get("/getAllTuteurs")
+               .then(response2 => {
+                 this.setState({
+                   TuteursOptions:response2.data,
+                 })
+                                  var found = false;
+
+              response2.data.forEach(element =>{
+                if(parseInt(datareceived.nomMaitreDeStage1,10)==parseInt(element.value,10)){
+                  found = true;
+                   this.setState({
+                      numMaitreDeStageSelection: element
+                   })                  
+                }
+                if (!found){ this.setState({
+                                numMaitreDeStageSelection: "Choisir1",
+                                numMaitreDeStage: "0"
+                                    })  
+                            }
+
+              })
+           })
+
+
+           axios.get("/getAllTuteurs")
+                   .then(response2 => {
+                     this.setState({
+                       TuteursOptions:response2.data,
+                     })
+                                      var found = false;
+
+                  response2.data.forEach(element =>{
+                    if(parseInt(datareceived.nomMaitreDeStage2,10)==parseInt(element.value,10)){
+                      found = true;
+                       this.setState({
+                          numMaitreDeSelection: element
+                       })                  
+                    }
+                    if (!found){ this.setState({
+                                    numMaitreDeSelection: "Choisir2",
+                                    numMaitreDe: "0"
+                                        })  
+                                }
+
+                  })
+               })
+
+
             })  
+
+
+            
   
  }  }
 
@@ -278,14 +419,54 @@ else
           
                 </select>
             </div>
-           
+            <div className="Terrain">
+              <label htmlFor="Terrain">Terrain de stage hospitalier:</label>
+
+              <select className="browser-default custom-select" value={this.state.value1} onChange={this.handleTerrainChange} >
+                {this.state.Terrains.map((terrain,index) =>(
+                    
+                  <option key={terrain.idterrain} value={terrain.idterrain}>{terrain.nom}</option>
+                
+                  
+                  ))
+                }
+              
+                onChange={this.handleTerrainChange}
+                
+          
+                </select>
+            </div>
             <div className="Responsable">
-              <label htmlFor="Responsable">Responsable Pédagogique:</label>
+              <label htmlFor="Responsable">Responsable pédagogique:</label>
 
                 <Select 
-                  placeholder="Choisir Tuteur"
+                  placeholder="Choisir Responsable"
                   value={this.state.numResponsableSelection}
                   onChange={this.handleResponsableChange}
+                  options={this.state.TuteursOptions}
+                />
+
+              <div style={{ fontSize: 10,color:"red"}}>{this.state.ResponsableError}</div>
+            </div>
+            <div className="M1">
+              <label htmlFor="M1">Maitre de stage universitaire 1:</label>
+
+                <Select 
+                  placeholder="Choisir Maitre de stage universitaire 1"
+                  value={this.state.numMaitreDeStageSelection}
+                  onChange={this.handleMaitreDeStageChange}
+                  options={this.state.TuteursOptions}
+                />
+
+              <div style={{ fontSize: 10,color:"red"}}>{this.state.ResponsableError}</div>
+            </div>
+            <div className="M2">
+              <label htmlFor="M2">Maitre de stage universitaire 2:</label>
+
+                <Select 
+                  placeholder="Choisir Maitre de stage universitaire 2"
+                  value={this.state.numMaitreDeSelection}
+                  onChange={this.handleMaitreDeChange}
                   options={this.state.TuteursOptions}
                 />
 

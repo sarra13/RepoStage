@@ -14,7 +14,6 @@ app.use(cors());
 var con = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "password",
   database: "testdb"
 });
 
@@ -284,8 +283,8 @@ app.get('/updateItemEtu',(req,res)=>{
 
 
 app.get('/stages/getDataSurStageEtudiant',(req,res)=>{
-	requette = `SELECT relationetudiantstages.id,  relationetudiantstages.numIDStage , relationetudiantstages.DES,relationetudiantstages.datedebut  , relationetudiantstages.datefin , relationetudiantstages.nomResponsable, 
-relationetudiantstages.Semestre,relationetudiantstages.numetu
+	requette = `SELECT relationetudiantstages.id, relationetudiantstages.nomMaitreDeStage1,relationetudiantstages.nomMaitreDeStage2, relationetudiantstages.numIDStage , relationetudiantstages.DES,relationetudiantstages.datedebut  , relationetudiantstages.datefin , relationetudiantstages.nomResponsable, 
+relationetudiantstages.Semestre,relationetudiantstages.numetu , relationetudiantstages.numIDTerrain
   FROM relationetudiantstages
 	  WHERE  relationetudiantstages.Semestre = `+req.query.Semestre+`
 	  and relationetudiantstages.DES = `+req.query.DES+`
@@ -314,7 +313,7 @@ con.query(requette, function (err, result, fields) {
 
 app.get('/stages/updateStagePourEtudiant',(req,res)=>{
 
-	requette = ` UPDATE relationetudiantstages SET numIDStage= `+req.query.numIDStage+`,nomResponsable = '`+req.query.nomResponsable+`' ,datedebut = '`+req.query.datedebut+`' , datefin = '`+req.query.datefin+`' 
+	requette = ` UPDATE relationetudiantstages SET numIDStage= `+req.query.numIDStage+`,nomResponsable = '`+req.query.nomResponsable+`,nomMaitreDeStage1 = '`+req.query.nomMaitreDeStage1+`',nomMaitreDeStage2 = '`+req.query.nomMaitreDeStage2+`' ,datedebut = '`+req.query.datedebut+`' , datefin = '`+req.query.datefin+`' ,numIDTerrain = '`+req.query.numIDTerrain+`
 	WHERE relationetudiantstages.Semestre = `+req.query.Semestre+`
 	and relationetudiantstages.DES = `+req.query.DES+`
 	  and relationetudiantstages.numetu =`+req.query.numetu  ;
