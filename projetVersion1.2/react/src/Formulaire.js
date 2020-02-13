@@ -204,22 +204,21 @@ toggleDiv = (choixlieu) => {
         this.setState({
           error:false })
    
-       var datareceived=response.data[0]
        
        this.setState({
-          value:datareceived.numIDStage,
+          value:response.data.numIDStage,
           value1:response.data.lieu,
-          numResponsable:datareceived.nomResponsable,
+          numResponsable:response.data.nomResponsable,
           numMaitreDeStage:response.data.encadrant1,
           numMaitreDe:response.data.encadrant2,
           numResponsableSelection:"",
           numMaitreDeSelection:"",
           numMaitreDeStageSelection:"",
           isLieu:response.data.isLieu,
-          startDate:new Date(datareceived.datedebut),
-          endDate:new Date(datareceived.datefin),
-          startDateValueToDB:(new Date(datareceived.datedebut).getYear()+1900)+"-"+ (new Date(datareceived.datedebut).getMonth() +1)+"-"+new Date(datareceived.datedebut).getDate(),
-          endDateValueToDB:(new Date(datareceived.datefin).getYear()+1900)+"-"+ (new Date(datareceived.datefin).getMonth() +1)+"-"+new Date(datareceived.datefin).getDate(),
+          startDate:new Date(response.data.datedebut),
+          endDate:new Date(response.data.datefin),
+          startDateValueToDB:(new Date(response.data.datedebut).getYear()+1900)+"-"+ (new Date(response.data.datedebut).getMonth() +1)+"-"+new Date(response.data.datedebut).getDate(),
+          endDateValueToDB:(new Date(response.data.datefin).getYear()+1900)+"-"+ (new Date(response.data.datefin).getMonth() +1)+"-"+new Date(response.data.datefin).getDate(),
        })
 
 
@@ -230,7 +229,7 @@ toggleDiv = (choixlieu) => {
                  })
                  var found = false;
               response2.data.forEach(element =>{
-                if(parseInt(datareceived.nomResponsable,10)==parseInt(element.value,10)){
+                if(parseInt(response.data.nomResponsable,10)==parseInt(element.value,10)){
                   found = true;
                    this.setState({
                       numResponsableSelection: element
@@ -251,7 +250,7 @@ toggleDiv = (choixlieu) => {
              })
              var found = false;
           response2.data.forEach(element =>{
-            if(parseInt(datareceived.nomMaitreDeStage1,10)==parseInt(element.value,10)){
+            if(parseInt(response.data.nomMaitreDeStage1,10)==parseInt(element.value,10)){
               found = true;
                this.setState({
                   numMaitreDeStageSelection: element
@@ -272,7 +271,7 @@ toggleDiv = (choixlieu) => {
          })
          var found = false;
       response2.data.forEach(element =>{
-        if(parseInt(datareceived.nomMaitreDeStage2,10)==parseInt(element.value,10)){
+        if(parseInt(response.data.nomMaitreDeStage2,10)==parseInt(element.value,10)){
           found = true;
            this.setState({
               numMaitreDeSelection: element
@@ -307,19 +306,19 @@ componentWillReceiveProps(newProps) {
               var datareceived=response.data[0]
 
               this.setState({
-                value:datareceived.numIDStage,
+                value:response.data.numIDStage,
                 value1:response.data.lieu,
-                numResponsable:datareceived.nomResponsable,
+                numResponsable:response.data.nomResponsable,
                 numMaitreDeStage:response.data.encadrant1,
                 numMaitreDe:response.data.encadrant2,
                 numResponsableSelection:"",
                 numMaitreDeSelection:"",
                 numMaitreDeStageSelection:"",
                 isLieu:response.data.isLieu,
-                startDate:new Date(datareceived.datedebut),
-                endDate:new Date(datareceived.datefin),
-                startDateValueToDB:(new Date(datareceived.datedebut).getYear()+1900)+"-"+ (new Date(datareceived.datedebut).getMonth() +1)+"-"+new Date(datareceived.datedebut).getDate(),
-                endDateValueToDB:(new Date(datareceived.datefin).getYear()+1900)+"-"+ (new Date(datareceived.datefin).getMonth() +1)+"-"+new Date(datareceived.datefin).getDate(),
+                startDate:new Date(response.data.datedebut),
+                endDate:new Date(response.data.datefin),
+                startDateValueToDB:(new Date(response.data.datedebut).getYear()+1900)+"-"+ (new Date(response.data.datedebut).getMonth() +1)+"-"+new Date(response.data.datedebut).getDate(),
+                endDateValueToDB:(new Date(response.data.datefin).getYear()+1900)+"-"+ (new Date(response.data.datefin).getMonth() +1)+"-"+new Date(response.data.datefin).getDate(),
             })
 
              axios.get("/getAllTuteurs")
@@ -330,7 +329,7 @@ componentWillReceiveProps(newProps) {
                                       var found = false;
 
                   response2.data.forEach(element =>{
-                    if(parseInt(datareceived.nomResponsable,10)==parseInt(element.value,10)){
+                    if(parseInt(response.data.nomResponsable,10)==parseInt(element.value,10)){
                       found = true;
                        this.setState({
                           numResponsableSelection: element
@@ -454,8 +453,8 @@ else
 <div style={{textAlign: "center"}}> 
 
       <MDBBtnGroup >
-        <MDBBtn color="grey lighten-5"   outline={this.state.choixlieu == 0 ? true  : false}  onClick={ ()=>this.toggleDiv(0) } >Maitres De Stage</MDBBtn>
-        <MDBBtn color="grey lighten-5"    outline={this.state.choixlieu == 1 ? true  : false}  onClick={ ()=>this.toggleDiv(1) } >Terrain De Stage</MDBBtn>
+        <MDBBtn color="grey lighten-5"   outline={this.state.choixlieu == 1 ? true  : false}  onClick={ ()=>this.toggleDiv(1) } >Maitres De Stage</MDBBtn>
+        <MDBBtn color="grey lighten-5"    outline={this.state.choixlieu == 0 ? true  : false}  onClick={ ()=>this.toggleDiv(0) } >Terrain De Stage</MDBBtn>
        
       </MDBBtnGroup>
 </div> 
