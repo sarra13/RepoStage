@@ -68,6 +68,7 @@ class Formulaire extends Component {
        value1:0,
        value:0,
       isLieu:1,
+      
      }
       this.handleSubmit  = this.handleSubmit .bind(this);
       this.toggleDiv = this.toggleDiv.bind(this)
@@ -180,7 +181,7 @@ toggleDiv = (choixlieu) => {
    this.setState(initialState)
 
        
-   axios.get("/stages/updateStagePourEtudiant?numetu="+this.props.numEtu+"&DES="+this.props.choixdes+"&Semestre="+this.props.choixsem+"&numIDStage="+this.state.value+"&numIDTerrain="+this.state.value1+"&nomMaitreDeStage1="+this.state.numMaitreDeStage+"&nomMaitreDeStage2="+this.state.numMaitreDe+ "&nomResponsable="+this.state.numResponsable +" &datedebut="+this.state.startDateValueToDB+ "&datefin="+this.state.endDateValueToDB)
+   axios.get("/stages/updateStagePourEtudiant?numetu="+this.props.numEtu+"&DES="+this.props.choixdes+"&Semestre="+this.props.choixsem+"&numIDStage="+this.state.value+"&isLieu="+this.state.isLieu+"&encadrant1="+this.state.numMaitreDeStage+"&encadrant2="+this.state.numMaitreDe+"&lieu="+this.state.value1+ "&nomResponsable="+this.state.numResponsable +" &datedebut="+this.state.startDateValueToDB+ "&datefin="+this.state.endDateValueToDB)
 
     this.toggleModalSuccesEnvoi();
 
@@ -207,13 +208,14 @@ toggleDiv = (choixlieu) => {
        
        this.setState({
           value:datareceived.numIDStage,
-          value1:datareceived.numIDTerrain,
+          value1:response.data.lieu,
           numResponsable:datareceived.nomResponsable,
-          numMaitreDeStage:datareceived.nomMaitreDeStage1,
-          numMaitreDe:datareceived.nomMaitreDeStage2,
+          numMaitreDeStage:response.data.encadrant1,
+          numMaitreDe:response.data.encadrant2,
           numResponsableSelection:"",
           numMaitreDeSelection:"",
           numMaitreDeStageSelection:"",
+          isLieu:response.data.isLieu,
           startDate:new Date(datareceived.datedebut),
           endDate:new Date(datareceived.datefin),
           startDateValueToDB:(new Date(datareceived.datedebut).getYear()+1900)+"-"+ (new Date(datareceived.datedebut).getMonth() +1)+"-"+new Date(datareceived.datedebut).getDate(),
@@ -306,10 +308,14 @@ componentWillReceiveProps(newProps) {
 
               this.setState({
                 value:datareceived.numIDStage,
-                value1:datareceived.numIDTerrain,
-                Responsable:datareceived.nomResponsable,
-                MaitreDeStage:datareceived.nomMaitreDeStage1,
-                MaitreDe:datareceived.nomMaitreDeStage2,
+                value1:response.data.lieu,
+                numResponsable:datareceived.nomResponsable,
+                numMaitreDeStage:response.data.encadrant1,
+                numMaitreDe:response.data.encadrant2,
+                numResponsableSelection:"",
+                numMaitreDeSelection:"",
+                numMaitreDeStageSelection:"",
+                isLieu:response.data.isLieu,
                 startDate:new Date(datareceived.datedebut),
                 endDate:new Date(datareceived.datefin),
                 startDateValueToDB:(new Date(datareceived.datedebut).getYear()+1900)+"-"+ (new Date(datareceived.datedebut).getMonth() +1)+"-"+new Date(datareceived.datedebut).getDate(),
@@ -347,7 +353,7 @@ componentWillReceiveProps(newProps) {
                                   var found = false;
 
               response2.data.forEach(element =>{
-                if(parseInt(datareceived.nomMaitreDeStage1,10)==parseInt(element.value,10)){
+                if(parseInt(response.data.encadrant1,10)==parseInt(element.value,10)){
                   found = true;
                    this.setState({
                       numMaitreDeStageSelection: element
@@ -371,7 +377,7 @@ componentWillReceiveProps(newProps) {
                                       var found = false;
 
                   response2.data.forEach(element =>{
-                    if(parseInt(datareceived.nomMaitreDeStage2,10)==parseInt(element.value,10)){
+                    if(parseInt(response.data.encadrant2,10)==parseInt(element.value,10)){
                       found = true;
                        this.setState({
                           numMaitreDeSelection: element

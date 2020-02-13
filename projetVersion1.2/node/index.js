@@ -53,7 +53,6 @@ app.get('/getDataSurEtudiant',(req,res)=>{
 	  	requette = `SELECT relationEtuItem.id,  relationEtuItem.numItem ,item.niveau as niveau ,
 		competence.id as compId ,capaciteCommune.nom as capComNom,capaciteCommune.id as capComId, item.nom, 
         relationEtuItem.bilan1 as bilan1 , relationEtuItem.bilan2 as bilan2, relationEtuItem.bilan3 as bilan3 
-
 		FROM relationEtuItem , item , capaciteCommune , competence 
 	    	WHERE relationEtuItem.numItem= item.id 
 	        and competence.id = `+req.query.competence+` 
@@ -283,12 +282,9 @@ app.get('/updateItemEtu',(req,res)=>{
 
 
 app.get('/stages/getDataSurStageEtudiant',(req,res)=>{
-	requette = `SELECT relationetudiantstages.id, relationetudiantstages.nomMaitreDeStage1,relationetudiantstages.nomMaitreDeStage2, relationetudiantstages.numIDStage , relationetudiantstages.DES,relationetudiantstages.datedebut  , relationetudiantstages.datefin , relationetudiantstages.nomResponsable, 
-relationetudiantstages.Semestre,relationetudiantstages.numetu , relationetudiantstages.numIDTerrain
-  FROM relationetudiantstages
+	requette = `SELECT * FROM relationetudiantstages
 	  WHERE  relationetudiantstages.Semestre = `+req.query.Semestre+`
 	  and relationetudiantstages.DES = `+req.query.DES+`
-
 	  and relationetudiantstages.numetu =`+req.query.numetu;
 
 	  
@@ -300,10 +296,16 @@ con.query(requette, function (err, result, fields) {
 		res.send({error : "database error"});
 		console.log("error occured in getDataSurStageEtudiant");
 	}
-	if (!Object.keys(result).length ){
+	else if (!Object.keys(result).length ){
 		res.send({error : "student not found"});
-	}else {		
-	  res.send(result);
+	}else {
+		var resultatOBJ = result[0] ;
+	if(resultatOBJ.isLieu==0){
+		lieuTab = resultatOBJ.lieu.split(" ");
+		resultatOBJ.encadrant1 = lieuTab[0];
+		resultatOBJ.encadrant2 = lieuTab[1] ? lieuTab[1] : "";
+	}		
+	  res.send(resultatOBJ);
 	}
 });
 
@@ -313,7 +315,7 @@ con.query(requette, function (err, result, fields) {
 
 app.get('/stages/updateStagePourEtudiant',(req,res)=>{
 
-	requette = ` UPDATE relationetudiantstages SET numIDStage= `+req.query.numIDStage+`,nomResponsable = '`+req.query.nomResponsable+`',nomMaitreDeStage1 = '`+req.query.nomMaitreDeStage1+`',nomMaitreDeStage2 = '`+req.query.nomMaitreDeStage2+`' ,datedebut = '`+req.query.datedebut+`' , datefin = '`+req.query.datefin+`' ,numIDTerrain = '`+req.query.numIDTerrain+`'
+	requette = ` UPDATE relationetudiantstages SET numIDStage= `+req.query.numIDStage+`,nomResponsable = '`+req.query.nomResponsable+`',isLieu = '`+req.query.isLieu+`',lieu = '`+req.query.lieu+`' ,datedebut = '`+req.query.datedebut+`' , datefin = '`+req.query.datefin+`' 
 	WHERE relationetudiantstages.Semestre = `+req.query.Semestre+`
 	and relationetudiantstages.DES = `+req.query.DES+`
 	  and relationetudiantstages.numetu =`+req.query.numetu  ;
@@ -333,17 +335,12 @@ app.get('/stages/updateStagePourEtudiant',(req,res)=>{
 	});
 
 	});
-
-	
-
 });
 
 app.get('/etudiant/getInformationsEtudiant',(req,res)=>{
 	requette = `SELECT etudiant.nom 
   FROM etudiant
 	  WHERE etudiant.id=`+req.query.id;
-	  
-
 	  
 	  console.log(requette);
 	  
