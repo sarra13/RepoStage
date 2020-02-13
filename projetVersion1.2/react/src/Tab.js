@@ -38,9 +38,9 @@ render(){
 <div style={{textAlign: "center"}}> 
 
       <MDBBtnGroup >
-        <MDBBtn color="grey lighten-5"   outline={this.state.choixdes == 1 ? true  : false}  onClick={ ()=>this.toggleDiv1(1) } >DES 1</MDBBtn>
-        <MDBBtn color="grey lighten-5"    outline={this.state.choixdes == 2 ? true  : false}  onClick={ ()=>this.toggleDiv1(2) } >DES 2</MDBBtn>
-        <MDBBtn color="grey lighten-5"  outline={this.state.choixdes == 3 ? true  : false}  onClick={ ()=>this.toggleDiv1(3) } >DES 3</MDBBtn>
+        <MDBBtn color="grey lighten-5" style={{width: 300}} outline={this.state.choixdes == 1 ? true  : false}  onClick={ ()=>this.toggleDiv1(1) } >DES 1</MDBBtn>
+        <MDBBtn color="grey lighten-5"  style={{width: 300}} outline={this.state.choixdes == 2 ? true  : false}  onClick={ ()=>this.toggleDiv1(2) } >DES 2</MDBBtn>
+        <MDBBtn color="grey lighten-5" style={{width: 300}} outline={this.state.choixdes == 3 ? true  : false}  onClick={ ()=>this.toggleDiv1(3) } >DES 3</MDBBtn>
       </MDBBtnGroup>
 </div> 
       {  this.state.show ?

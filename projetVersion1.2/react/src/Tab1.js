@@ -33,8 +33,8 @@ class Tab1 extends Component{
            <React.Fragment>
             <div style={{textAlign: "center"}}>  
                   <MDBBtnGroup>
-                    <MDBBtn color="grey lighten-5"  outline={this.state.choixsem == 1 ? true  : false}  onClick={ ()=>this.toggleDiv1(1) } >Semestre 1</MDBBtn>
-                    <MDBBtn color="grey lighten-5"  outline={this.state.choixsem == 2 ? true  : false}  onClick={ ()=>this.toggleDiv1(2) } >Semestre 2</MDBBtn>
+                    <MDBBtn color="grey lighten-5" style={{width: 300}} outline={this.state.choixsem == 1 ? true  : false}  onClick={ ()=>this.toggleDiv1(1) } >Semestre 1</MDBBtn>
+                    <MDBBtn color="grey lighten-5" style={{width: 300}} outline={this.state.choixsem == 2 ? true  : false}  onClick={ ()=>this.toggleDiv1(2) } >Semestre 2</MDBBtn>
                   </MDBBtnGroup>
             </div>
   {  this.props.choixdes !=0 && this.state.show ?

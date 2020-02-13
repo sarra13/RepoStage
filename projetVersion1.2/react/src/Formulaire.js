@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import axios from 'axios';
 import {MDBAlert} from 'mdbreact';
+import {MDBBtnGroup} from 'mdbreact';
 
 import"./Formulaire.css";
 import DatePicker from "react-datepicker";
@@ -40,6 +41,8 @@ class Formulaire extends Component {
       numMaitreDeSelection:"",
       numMaitreDeStageSelection:"",
       numResponsableSelection : "" ,
+      choixlieu:0,
+      show : false ,
       stages:  [
               { id: '1',DES :"1" , sujet: "Stage d'urgences "},
               { id: '2',DES :"1" , sujet: "Stage chez le praticien de niveau 1" },
@@ -64,9 +67,11 @@ class Formulaire extends Component {
       modal: false,
        value1:0,
        value:0,
-      
+      isLieu:1,
      }
       this.handleSubmit  = this.handleSubmit .bind(this);
+      this.toggleDiv = this.toggleDiv.bind(this)
+
   }
  
 toggleModalSuccesEnvoi = () => {
@@ -161,6 +166,11 @@ toggleModalSuccesEnvoi = () => {
   }
   return true;
 };
+toggleDiv = (choixlieu) => {
+  const {show} =this.state
+    this.setState( { choixlieu : choixlieu , show: true} )
+}
+
   
   handleSubmit = e => {
   e.preventDefault();
@@ -383,6 +393,8 @@ componentWillReceiveProps(newProps) {
             
   
  }  }
+ 
+
 
   render() {
 if (this.props.numEtu==''){
@@ -419,7 +431,32 @@ else
           
                 </select>
             </div>
-            <div className="Terrain">
+            <div className="Responsable">
+              <label htmlFor="Responsable">Responsable pédagogique:</label>
+
+                <Select 
+                  placeholder="Choisir Responsable"
+                  value={this.state.numResponsableSelection}
+                  onChange={this.handleResponsableChange}
+                  options={this.state.TuteursOptions}
+                />
+
+              <div style={{ fontSize: 10,color:"red"}}>{this.state.ResponsableError}</div>
+            </div>
+            
+            <React.Fragment>
+<div style={{textAlign: "center"}}> 
+
+      <MDBBtnGroup >
+        <MDBBtn color="grey lighten-5"   outline={this.state.choixlieu == 0 ? true  : false}  onClick={ ()=>this.toggleDiv(0) } >Maitres De Stage</MDBBtn>
+        <MDBBtn color="grey lighten-5"    outline={this.state.choixlieu == 1 ? true  : false}  onClick={ ()=>this.toggleDiv(1) } >Terrain De Stage</MDBBtn>
+       
+      </MDBBtnGroup>
+</div> 
+      {  this.state.show && this.state.choixlieu ==this.state.isLieu ?
+ 
+      
+          <div className="Terrain">
               <label htmlFor="Terrain">Terrain de stage hospitalier:</label>
 
               <select className="browser-default custom-select" value1={this.state.value1} onChange={this.handleTerrainChange} >
@@ -435,19 +472,9 @@ else
                 
           
                 </select>
-            </div>
-            <div className="Responsable">
-              <label htmlFor="Responsable">Responsable pédagogique:</label>
-
-                <Select 
-                  placeholder="Choisir Responsable"
-                  value={this.state.numResponsableSelection}
-                  onChange={this.handleResponsableChange}
-                  options={this.state.TuteursOptions}
-                />
-
-              <div style={{ fontSize: 10,color:"red"}}>{this.state.ResponsableError}</div>
-            </div>
+                </div>
+          :
+          <React.Fragment>
             <div className="M1">
               <label htmlFor="M1">Maitre de stage universitaire 1:</label>
 
@@ -473,6 +500,10 @@ else
               <div style={{ fontSize: 10,color:"red"}}>{this.state.ResponsableError}</div>
             </div>
           
+            </React.Fragment>
+      }
+ </React.Fragment>
+
               <div className="DateDebut">
               <label htmlFor="DateDebut">Date Début:</label>
                  
