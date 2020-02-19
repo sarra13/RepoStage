@@ -1,5 +1,5 @@
 import React , { Component } from 'react';
-import { MDBTable, MDBTableBody, MDBTableHead,MDBBtnGroup ,MDBBtn,MDBContainer, MDBAlert} from 'mdbreact';
+import { MDBTable, MDBTableBody, MDBTableHead,MDBBtnGroup ,MDBBtn,MDBContainer, MDBAlert, MDBIcon,MDBModal, MDBModalBody, MDBModalHeader, MDBModalFooter} from 'mdbreact';
 import axios from 'axios';
 
 class TableCompetences extends Component {
@@ -9,6 +9,8 @@ class TableCompetences extends Component {
           super(props)
           this.state ={
             dataRetreived : [],
+            modal: false, 
+            lastModified:''
             }
 
 
@@ -16,6 +18,20 @@ class TableCompetences extends Component {
             this.changeBilan2 = this.changeBilan2.bind(this);
             this.changeBilan3 = this.changeBilan3.bind(this);  
           }
+
+
+      toggleModalSuccesEnvoi = (bilan , id) => {
+
+              axios.get("/getTimeOfLastChange?bilan="+bilan+"&id="+id)
+                .then(response => {
+                  this.setState({
+                    modal: !this.state.modal,
+                    lastModified: response.data.time
+                  });  
+                })
+  
+
+      }
 
   componentDidMount() {
          if (   Number.isInteger(parseInt(this.props.numEtu,10)) && Number.isInteger(parseInt(this.props.compentenceIndex,10)) ){
@@ -54,8 +70,12 @@ class TableCompetences extends Component {
 
 changeBilan1 = (event , index) => {
   var dataRetreivedCopy = this.state.dataRetreived ;
+  dataRetreivedCopy[index].bilan1 = parseInt(event.target.value) ;
+  if(parseInt(event.target.value)==2){
+      dataRetreivedCopy[index].bilan2 = 2 ;
+      dataRetreivedCopy[index].bilan3 = 2 ;
+  }
 
-  dataRetreivedCopy[index].bilan1 = event.target.value ;
   this.setState({
         dataRetreived : dataRetreivedCopy
   })
@@ -71,8 +91,10 @@ changeBilan1 = (event , index) => {
 }
 changeBilan2 = (event , index) => {
   var dataRetreivedCopy = this.state.dataRetreived ;
-  dataRetreivedCopy[index].bilan2 = event.target.value ;
-  this.setState({
+  dataRetreivedCopy[index].bilan2 = parseInt(event.target.value) ;
+  if(parseInt(event.target.value)==2){
+      dataRetreivedCopy[index].bilan3 = 2 ;
+  }  this.setState({
         dataRetreived : dataRetreivedCopy
   })
 
@@ -124,6 +146,17 @@ if (this.props.compentenceIndex==0){
 else return (
   
         <MDBTable striped>
+               <MDBContainer>
+                <MDBModal isOpen={this.state.modal} toggle={() =>{ this.setState({modal: !this.state.modal }); } } >
+                  <MDBModalHeader toggle={() =>{ this.setState({modal: !this.state.modal }); } }></MDBModalHeader>
+                  <MDBModalBody>
+                    derniere modification : {this.state.lastModified}
+                  </MDBModalBody>
+                  <MDBModalFooter>
+                    <MDBBtn color="primary" onClick={() =>{ this.setState({modal: !this.state.modal }); } } >Fermer</MDBBtn>
+                  </MDBModalFooter>
+                </MDBModal>
+              </MDBContainer>
           <MDBTableHead>
       <tr  >
         <th  style={{textAlign: "center" , verticalAlign: "middle"}}  
@@ -153,37 +186,47 @@ else return (
 
 
         <td>{element.id}</td>
-        <td width="70%" style={{color: element.niveau==1 ?"#eb3333":element.niveau==2 ?"#f58310":"#a2f800" }} >
+        <td width="50%" style={{color: element.niveau==1 ?"#eb3333":element.niveau==2 ?"#f58310":"#a2f800" }} >
 
           {element.nom}
         </td>
-        <td width="10%"> 
-         {this.state.isVerrouille == "true" ? 
+        <td width="15%"> 
+          <div style={{display: "flex"}}>
+            <div style={{float: "left",display: "inline-block"}} onClick={() => this.toggleModalSuccesEnvoi(1,element.id) }>
+              <MDBIcon far icon="clock" />
+            </div>
+          {this.state.isVerrouille == "true" ? 
 
           <div style={{textAlign: "center" }} >{element.bilan1==0 ?"non acquis" :element.bilan1==1 ?"en cours"  :"acquis"}</div>
 
           :
-                <select 
+           <div style={{float: "right",display: "inline-block"  }} >
+              <select 
                   value={element.bilan1} 
                   style={{backgroundColor:element.bilan1==0 ?"#eb3333":element.bilan1==1 ?"#f58310":"#a2f800"}} 
                   onChange={(e) => this.changeBilan1(e,index)}  
                   className="browser-default custom-select">
                    
-
                 <option value="0">Non Acquis</option>
                 <option value="1">En Cours</option>
                 <option value="2">Acquis</option>
-              </select> 
 
+              </select> 
+          </div>
         }
-        </td>
-        <td width="10%"> 
+        </div>
+        </td> 
+        <td width="15%"> 
+           <div style={{display: "flex"}}>
+          <div style={{float: "left",display: "inline-block"}} onClick={() => this.toggleModalSuccesEnvoi(2,element.id)}>
+            <MDBIcon far icon="clock" />
+          </div>
          {this.state.isVerrouille == "true"  ? 
 
-          <div style={{textAlign: "center" }} >{element.bilan2==0 ?"non acquis" :element.bilan2==1 ?"en cours"  :"acquis"}</div>
+          <div style={{textAlign: "center",display: "inline-block" }} >{element.bilan2==0 ?"non acquis" :element.bilan2==1 ?"en cours"  :"acquis"}</div>
 
           :
-
+           <div style={{float: "right",display: "inline-block"  }} >
               <select 
                 value={element.bilan2} 
                 style={{backgroundColor:element.bilan2==0 ?"#eb3333":element.bilan2==1 ? "#f58310":"#a2f800"}} 
@@ -194,16 +237,21 @@ else return (
                 <option value="1">En Cours</option>
                 <option value="2">Acquis</option>
               </select> 
+          </div>
         }
+        </div>
         </td> 
-        <td width="10%"> 
-
+        <td width="15%"> 
+           <div style={{display: "flex"}}>
+          <div style={{float: "left",display: "inline-block"}} onClick={() => this.toggleModalSuccesEnvoi(3,element.id)}>
+            <MDBIcon far icon="clock" />
+          </div>
         {this.state.isVerrouille == "true"  ? 
 
           <div style={{textAlign: "center" }} >{element.bilan3==0 ?"non acquis" :element.bilan3==1 ?"en cours"  :"acquis"}</div>
 
           :
-
+           <div style={{float: "right",display: "inline-block"  }} >
               <select 
                 value={element.bilan3} 
                 style={{backgroundColor:element.bilan3==0 ?"#eb3333" :element.bilan3==1 ?"#f58310"  :"#a2f800"}} 
@@ -213,8 +261,10 @@ else return (
                 <option value="1">En Cours</option>
                 <option value="2">Acquis</option>
               </select> 
+          </div>
         }
-        </td>
+        </div>
+      </td>
 
       </tr>)
      : null

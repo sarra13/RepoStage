@@ -1,0 +1,143 @@
+
+  body * {
+    transition: all 0.300s ease-in-out;
+  }
+ 
+  
+  
+  
+  
+  
+   /*------------- MAIN SECTION -------------------*/
+  
+  
+  
+  
+  /*------------- GALLERY -------------------*/
+  
+  .gallery{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    height: 820px;
+    width: 95%;
+    margin: 180px auto 0px auto;
+    -webkit-box-shadow: 0px 10px 20px -11px rgba(0,0,0,0.9);
+   -moz-box-shadow: 0px 10px 20px -11px rgba(0,0,0,0.9);
+   box-shadow: 0px 10px 20px -11px rgba(0,0,0,0.9);
+  }
+  
+  .gallery div {
+    width: 100%;
+    height: 100%;
+    position: relative;
+     overflow: hidden;
+     filter: grayscale(83%);
+  }
+  
+  /* images are not compressed, remember to compress them before deployment */
+  .gallery div.gallery-item-one {
+    background: url("./img/1.jpg");
+    background-size: 160%;
+   grid-column-end: span 2;
+   grid-row-end: span 2;
+  }
+  
+  .gallery div.gallery-item-two {
+    background: url("./img/2.jpeg");
+    background-size: 160%;
+  }
+  .gallery div.gallery-item-three {
+    background: url("./img/3.jpg");
+    background-size: 160%;
+  }
+  
+  .gallery div.gallery-item-four {
+    background: url("./img/4.png");
+    background-size: 160%;
+  }
+  .gallery div.gallery-item-five {
+    background: url("./img/5.jpg");
+    background-size: 160%;
+  }
+  .gallery div.gallery-item-six {
+    background: url("./img/6.png");
+    background-size: 160%;
+  }
+  .gallery div.gallery-item-one:hover, .gallery div.gallery-item-two:hover, .gallery div.gallery-item-three:hover, .gallery div.gallery-item-four:hover, .gallery div.gallery-item-five:hover, .gallery div.gallery-item-six:hover{
+    background-size: 100%;
+    filter: grayscale(0%);
+  }
+  
+  
+  
+  
+  
+  
+  @media (max-width:1310px) and (min-width:1100px) {
+      
+     
+    
+    
+      
+      
+  
+      .gallery{
+        height: 600px;
+      }
+  }
+  
+  
+  
+ 
+   
+    
+    
+   
+  
+    .gallery{
+      height: 420px;
+    }
+  
+  
+  
+  
+  
+  
+    
+  
+    
+  
+  
+  
+  
+    .gallery{
+      height: 400px;
+    }
+  
+  
+  
+  @media (max-width:599px) and (min-width:0px) {
+    
+    
+  
+    
+    
+   
+    .gallery{
+      grid-template-columns: 1fr;
+      height: auto;
+      margin: 30px auto 0px auto;
+    }
+    .gallery div {
+      height: 200px;
+    }
+  
+    .gallery div.gallery-item-one {
+     grid-column-end: span 1;
+     grid-row-end: span 1;
+    }
+  
+   
+   
+    
+  }

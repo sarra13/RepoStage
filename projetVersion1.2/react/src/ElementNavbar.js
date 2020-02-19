@@ -18,11 +18,12 @@ import AdminPanel from './AdminPanel'
 import Tab from './Tab'
 import { BrowserRouter as Router , Switch, Route,  Link,Redirect,withRouter} from 'react-router-dom';
 import Etudiant from './Etudiant';
+import Acceuil from './Acceuil';
 const Main = styled.main`
     position: relative;
     overflow: hidden;
     transition: all .15s;
-    padding: 0 20px;
+    padding: 0 0px;
     margin-left: ${props => (props.expanded ? 240 : 64)}px;
 `;
 
@@ -213,7 +214,7 @@ options={this.state.options}
                              /></Link>
                         </NavIcon>
                         <NavText style={{ paddingRight: 32 }}>
-                        <Link onClick={this.deverrouiller.bind(this)} >Deverrouiller </Link>
+                        <Link onClick={this.deverrouiller.bind(this)} >Déverrouiller </Link>
                         </NavText>
                     </NavItem>
                           :
@@ -224,7 +225,7 @@ options={this.state.options}
                                /></Link>
                           </NavIcon>
                           <NavText style={{ paddingRight: 32 }}>
-                          <Link onClick={this.verrouiller.bind(this)} >Verrouiller </Link>
+                          <Link onClick={this.verrouiller.bind(this)} >Vérrouiller </Link>
                           </NavText>
                       </NavItem>
                                           
@@ -257,7 +258,7 @@ options={this.state.options}
                              /></Link>
                         </NavIcon>
                         <NavText style={{ paddingRight: 32 }}>
-                        <Link className="lien" to="/" > Acceuil</Link>
+                        <Link className="lien" to="/" > Accueil</Link>
                         </NavText>
                     </NavItem>
                     <NavItem >
@@ -304,14 +305,23 @@ options={this.state.options}
                         </NavText>
                     </NavItem>
 
-                   
+                    <NavItem eventKey="/Aide" >
+                        <NavIcon>
+
+                        <Link className="lien" to="/Aide" > <i className="fa fa-fw fa-key" style={{ fontSize: '1.75em' }}
+                             /></Link>
+                        </NavIcon>
+                        <NavText style={{ paddingRight: 32 }}>
+                        <Link className="lien" to="/Aide" > Aide</Link>
+                        </NavText>
+                    </NavItem>
                     <NavItem >
                         <NavIcon>
 
                         <Link onClick={this.logout.bind(this)} > <i className="fa fa-fw fa-power-off" style={{ fontSize: '1.75em' }} /></Link>
                         </NavIcon>
                         <NavText style={{ paddingRight: 32 }}>
-                        <Link onClick={this.logout.bind(this)} >Logout</Link>
+                        <Link onClick={this.logout.bind(this)} >Déconnexion</Link>
 
                         </NavText>
                     </NavItem>
@@ -322,7 +332,7 @@ options={this.state.options}
                   <Main expanded={this.state.expanded} >
                      <Route exact path="/">
 
-                        <Aide /> 
+                        <Acceuil /> 
                      </Route>
 
                       <Route  path="/competences">
@@ -356,6 +366,10 @@ options={this.state.options}
                       >
                       </Route>
                       
+                      <Route exact path="/Aide">
+
+<Aide /> 
+</Route>
 
                       </Main>
 

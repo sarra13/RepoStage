@@ -36,12 +36,12 @@ class Formulaire extends Component {
       endDate:new Date(),
       endDateValueToDB:"",
       numResponsable : "" ,
-      numMaitreDe:"",
-      numMaitreDeStage:"",
-      numMaitreDeSelection:"",
-      numMaitreDeStageSelection:"",
+      numEncadrant2:"",
+      numEncadrant1:"",
+      numEncadrant2Selection:"",
+      numEncadrant1Selection:"",
       numResponsableSelection : "" ,
-      choixlieu:0,
+      isLieu:0,
       show : false ,
       stages:  [
               { id: '1',DES :"1" , sujet: "Stage d'urgences "},
@@ -65,13 +65,13 @@ class Formulaire extends Component {
       ] ,    
        datareceived:"",
       modal: false,
-       value1:0,
-       value:0,
-      isLieu:1,
+       numLieuStage:0,
+       numIDStage:0,
+      isLieu:"",
       
      }
       this.handleSubmit  = this.handleSubmit .bind(this);
-      this.toggleDiv = this.toggleDiv.bind(this)
+      this.switchIsLieu = this.switchIsLieu.bind(this)
 
   }
  
@@ -84,10 +84,9 @@ toggleModalSuccesEnvoi = () => {
 
     handleStagesChange = (event , index) => {
       var data = this.state.stages ;
-    
-     this.state. value= event.target.value ;
-      this.setState({
-            stages : data
+          this.setState({
+            stages : data,
+            numIDStage :event.target.value
       })
       
       }  
@@ -95,7 +94,7 @@ toggleModalSuccesEnvoi = () => {
       handleTerrainChange = (e , index) => {
         var data1 = this.state.Terrains ;
       
-       this.state. value1= e.target.value ;
+       this.state. numLieuStage= e.target.value ;
         this.setState({
               Terrains : data1
         })
@@ -113,16 +112,16 @@ toggleModalSuccesEnvoi = () => {
       handleMaitreDeStageChange = selectedOption => {
 
         this.setState({
-          numMaitreDeStage : selectedOption.value ,
-          numMaitreDeStageSelection : selectedOption 
+          numEncadrant1 : selectedOption.value ,
+          numEncadrant1Selection : selectedOption 
         }) 
         console.log(selectedOption) 
   }
   handleMaitreDeChange = selectedOption => {
 
     this.setState({
-      numMaitreDe: selectedOption.value ,
-      numMaitreDeSelection : selectedOption 
+      numEncadrant2: selectedOption.value ,
+      numEncadrant2Selection : selectedOption 
     }) 
     console.log(selectedOption) 
 }
@@ -167,9 +166,10 @@ toggleModalSuccesEnvoi = () => {
   }
   return true;
 };
-toggleDiv = (choixlieu) => {
-  const {show} =this.state
-    this.setState( { choixlieu : choixlieu , show: true} )
+switchIsLieu = (isLieu) => {
+    this.setState( {
+     isLieu : isLieu
+          } )
 }
 
   
@@ -180,8 +180,8 @@ toggleDiv = (choixlieu) => {
     if(isValid){
    this.setState(initialState)
 
-       
-   axios.get("/stages/updateStagePourEtudiant?numetu="+this.props.numEtu+"&DES="+this.props.choixdes+"&Semestre="+this.props.choixsem+"&numIDStage="+this.state.value+"&isLieu="+this.state.isLieu+"&encadrant1="+this.state.numMaitreDeStage+"&encadrant2="+this.state.numMaitreDe+"&lieu="+this.state.value1+ "&nomResponsable="+this.state.numResponsable +" &datedebut="+this.state.startDateValueToDB+ "&datefin="+this.state.endDateValueToDB)
+       alert("/stages/updateStagePourEtudiant?numetu="+this.props.numEtu+"&DES="+this.props.choixdes+"&Semestre="+this.props.choixsem+"&numIDStage="+this.state.numIDStage+"&isLieu="+this.state.isLieu+"&encadrant1="+this.state.numEncadrant1+"&encadrant2="+this.state.numEncadrant2+"&lieu="+this.state.numLieuStage+ "&nomResponsable="+this.state.numResponsable +"&datedebut="+this.state.startDateValueToDB+ "&datefin="+this.state.endDateValueToDB)
+   axios.get("/stages/updateStagePourEtudiant?numetu="+this.props.numEtu+"&DES="+this.props.choixdes+"&Semestre="+this.props.choixsem+"&numIDStage="+this.state.numIDStage+"&isLieu="+this.state.isLieu+"&encadrant1="+this.state.numEncadrant1+"&encadrant2="+this.state.numEncadrant2+"&lieu="+this.state.numLieuStage+ "&nomResponsable="+this.state.numResponsable +"&datedebut="+this.state.startDateValueToDB+ "&datefin="+this.state.endDateValueToDB)
 
     this.toggleModalSuccesEnvoi();
 
@@ -196,25 +196,24 @@ toggleDiv = (choixlieu) => {
    
       axios.get("/stages/getDataSurStageEtudiant?Semestre="+this.props.choixsem+"&numetu="+this.props.numEtu+"&DES="+this.props.choixdes)
      .then(response => {
-      if (response.data.error=="true"){
+      if (response.data.error){
         this.setState({
-          error:true })
+          error:response.data.error })
         }
         else {
-        this.setState({
-          error:false })
+
    
-       
+       console.log(response.data);
        this.setState({
-          value:response.data.numIDStage,
-          value1:response.data.lieu,
+          numIDStage:response.data.numIDStage,
+          numLieuStage:response.data.lieu=='' ? 1 : response.data.lieu ,
           numResponsable:response.data.nomResponsable,
-          numMaitreDeStage:response.data.encadrant1,
-          numMaitreDe:response.data.encadrant2,
+          numEncadrant1:response.data.encadrant1,
+          numEncadrant2:response.data.encadrant2,
           numResponsableSelection:"",
-          numMaitreDeSelection:"",
-          numMaitreDeStageSelection:"",
-          isLieu:response.data.isLieu,
+          numEncadrant2Selection:"",
+          numEncadrant1Selection:"",
+          isLieu:response.data.isLieu=='' ? 1 : response.data.isLieu  ,
           startDate:new Date(response.data.datedebut),
           endDate:new Date(response.data.datefin),
           startDateValueToDB:(new Date(response.data.datedebut).getYear()+1900)+"-"+ (new Date(response.data.datedebut).getMonth() +1)+"-"+new Date(response.data.datedebut).getDate(),
@@ -222,68 +221,60 @@ toggleDiv = (choixlieu) => {
        })
 
 
-         axios.get("/getAllTuteurs")
-               .then(response2 => {
-                 this.setState({
-                   TuteursOptions:response2.data,
-                 })
-                 var found = false;
-              response2.data.forEach(element =>{
-                if(parseInt(response.data.nomResponsable,10)==parseInt(element.value,10)){
-                  found = true;
+
+        axios.get("/getAllTuteurs")
+             .then(response1 => {
+
                    this.setState({
-                      numResponsableSelection: element
-                   })                  
-                }
-                if (!found){ this.setState({
-                                    numResponsableSelection: "Choisir",
-                                    numResponsable: "0"
-                                        })   
-                            }
-              })
-           })
+                     TuteursOptions:response1.data,
+                   })
+                 
+              
+                var foundRespo = false;
+                var foudEncadrant1 = false;
+                var foudEncadrant2 = false;
+                response1.data.forEach(element =>{
 
-           axios.get("/getAllTuteurs")
-           .then(response2 => {
-             this.setState({
-               TuteursOptions:response2.data,
+                  if(parseInt(response.data.nomResponsable,10)==parseInt(element.value,10)){
+                    foundRespo = true;
+                     this.setState({
+                        numResponsableSelection: element
+                     })                  
+                  }
+                  if(parseInt(response.data.encadrant1,10)==parseInt(element.value,10)){
+                    foudEncadrant1 = true;
+                     this.setState({
+                        numEncadrant1Selection: element
+                     })                  
+                  }
+                  if(parseInt(response.data.encadrant2,10)==parseInt(element.value,10)){
+                    foudEncadrant2 = true;
+                     this.setState({
+                        numEncadrant2Selection: element
+                     })                  
+                  }
+
+                })
+
+                  if (!foundRespo){ 
+                    this.setState({
+                        numResponsableSelection: "Choisir",
+                        numResponsable: "0"
+                    })  
+                  }
+                  if (!foudEncadrant1){ 
+                      this.setState({
+                        numEncadrant1Selection: "Choisir1",
+                        numEncadrant1: "0"
+                            })  
+                   }
+                  if (!foudEncadrant2){ 
+                    this.setState({
+                      numEncadrant2Selection: "Choisir2",
+                      numEncadrant2: "0"
+                   })  
+                  }
              })
-             var found = false;
-          response2.data.forEach(element =>{
-            if(parseInt(response.data.nomMaitreDeStage1,10)==parseInt(element.value,10)){
-              found = true;
-               this.setState({
-                  numMaitreDeStageSelection: element
-               })                  
-            }
-            if (!found){ this.setState({
-                                numMaitreDeStageSelection: "Choisir1",
-                                numMaitreDeStage: "0"
-                                    })   
-                        }
-          })
-       })
-
-       axios.get("/getAllTuteurs")
-       .then(response2 => {
-         this.setState({
-           TuteursOptions:response2.data,
-         })
-         var found = false;
-      response2.data.forEach(element =>{
-        if(parseInt(response.data.nomMaitreDeStage2,10)==parseInt(element.value,10)){
-          found = true;
-           this.setState({
-              numMaitreDeSelection: element
-           })                  
-        }
-        if (!found){ this.setState({
-                            numMaitreDeSelection: "Choisir2",
-                            numMaitreDe: "0"
-                                })   
-                    }
-      })
-   })
 
       }
      })  
@@ -294,103 +285,87 @@ toggleDiv = (choixlieu) => {
 componentWillReceiveProps(newProps) {
 
   if (  (this.props.numEtu !==  newProps.numEtu &&  Number.isInteger(parseInt(newProps.numEtu,10)) ) || ( this.props.choixsem !==  newProps.choixsem &&  Number.isInteger(parseInt(newProps.choixsem,10)) ) || (this.props.choixdes !==  newProps.choixdes &&  Number.isInteger(parseInt(newProps.choixdes,10)))  ){
-            axios.get("/getAllTuteurs")
-         .then(response => {
 
-           this.setState({
-             TuteursOptions:response.data,
-           })
-         })
              axios.get("http://127.0.0.1:3001/stages/getDataSurStageEtudiant?Semestre="+newProps.choixsem+"&numetu="+newProps.numEtu+"&DES="+newProps.choixdes)
             .then(response => {
-              var datareceived=response.data[0]
+            
+if(response.data.error){
+  this.setState({
+    error : response.data.error
+  })
+}
+            else{
+                  this.setState({
+                    numIDStage:response.data.numIDStage,
+                    numLieuStage:response.data.lieu,
+                    numResponsable:response.data.nomResponsable,
+                    numEncadrant1:response.data.encadrant1,
+                    numEncadrant2:response.data.encadrant2,
+                    numResponsableSelection:"",
+                    numEncadrant2Selection:"",
+                    numEncadrant1Selection:"",
+                    isLieu:response.data.isLieu,
+                    startDate:new Date(response.data.datedebut),
+                    endDate:new Date(response.data.datefin),
+                    startDateValueToDB:(new Date(response.data.datedebut).getYear()+1900)+"-"+ (new Date(response.data.datedebut).getMonth() +1)+"-"+new Date(response.data.datedebut).getDate(),
+                    endDateValueToDB:(new Date(response.data.datefin).getYear()+1900)+"-"+ (new Date(response.data.datefin).getMonth() +1)+"-"+new Date(response.data.datefin).getDate(),
+                })
+              
 
-              this.setState({
-                value:response.data.numIDStage,
-                value1:response.data.lieu,
-                numResponsable:response.data.nomResponsable,
-                numMaitreDeStage:response.data.encadrant1,
-                numMaitreDe:response.data.encadrant2,
-                numResponsableSelection:"",
-                numMaitreDeSelection:"",
-                numMaitreDeStageSelection:"",
-                isLieu:response.data.isLieu,
-                startDate:new Date(response.data.datedebut),
-                endDate:new Date(response.data.datefin),
-                startDateValueToDB:(new Date(response.data.datedebut).getYear()+1900)+"-"+ (new Date(response.data.datedebut).getMonth() +1)+"-"+new Date(response.data.datedebut).getDate(),
-                endDateValueToDB:(new Date(response.data.datefin).getYear()+1900)+"-"+ (new Date(response.data.datefin).getMonth() +1)+"-"+new Date(response.data.datefin).getDate(),
-            })
+                 axios.get("/getAllTuteurs")
+                 .then(response1 => {
 
-             axios.get("/getAllTuteurs")
-                   .then(response2 => {
-                     this.setState({
-                       TuteursOptions:response2.data,
-                     })
-                                      var found = false;
-
-                  response2.data.forEach(element =>{
-                    if(parseInt(response.data.nomResponsable,10)==parseInt(element.value,10)){
-                      found = true;
                        this.setState({
-                          numResponsableSelection: element
-                       })                  
-                    }
-                    if (!found){ this.setState({
-                                    numResponsableSelection: "Choisir",
-                                    numResponsable: "0"
-                                        })  
-                                }
+                         TuteursOptions:response1.data,
+                       })
+                     
+                  
+                    var foundRespo = false;
+                    var foudEncadrant1 = false;
+                    var foudEncadrant2 = false;
+                    response1.data.forEach(element =>{
 
-                  })
-               })
+                      if(parseInt(response.data.nomResponsable,10)==parseInt(element.value,10)){
+                        foundRespo = true;
+                         this.setState({
+                            numResponsableSelection: element
+                         })                  
+                      }
+                      if(parseInt(response.data.encadrant1,10)==parseInt(element.value,10)){
+                        foudEncadrant1 = true;
+                         this.setState({
+                            numEncadrant1Selection: element
+                         })                  
+                      }
+                      if(parseInt(response.data.encadrant2,10)==parseInt(element.value,10)){
+                        foudEncadrant2 = true;
+                         this.setState({
+                            numEncadrant2Selection: element
+                         })                  
+                      }
 
-               axios.get("/getAllTuteurs")
-               .then(response2 => {
-                 this.setState({
-                   TuteursOptions:response2.data,
+                    })
+
+                      if (!foundRespo){ 
+                        this.setState({
+                            numResponsableSelection: "Choisir",
+                            numResponsable: "0"
+                        })  
+                      }
+                      if (!foudEncadrant1){ 
+                          this.setState({
+                            numEncadrant1Selection: "Choisir1",
+                            numEncadrant1: "0"
+                                })  
+                       }
+                      if (!foudEncadrant2){ 
+                        this.setState({
+                          numEncadrant2Selection: "Choisir2",
+                          numEncadrant2: "0"
+                       })  
+                      }
                  })
-                                  var found = false;
-
-              response2.data.forEach(element =>{
-                if(parseInt(response.data.encadrant1,10)==parseInt(element.value,10)){
-                  found = true;
-                   this.setState({
-                      numMaitreDeStageSelection: element
-                   })                  
-                }
-                if (!found){ this.setState({
-                                numMaitreDeStageSelection: "Choisir1",
-                                numMaitreDeStage: "0"
-                                    })  
-                            }
-
-              })
-           })
-
-
-           axios.get("/getAllTuteurs")
-                   .then(response2 => {
-                     this.setState({
-                       TuteursOptions:response2.data,
-                     })
-                                      var found = false;
-
-                  response2.data.forEach(element =>{
-                    if(parseInt(response.data.encadrant2,10)==parseInt(element.value,10)){
-                      found = true;
-                       this.setState({
-                          numMaitreDeSelection: element
-                       })                  
-                    }
-                    if (!found){ this.setState({
-                                    numMaitreDeSelection: "Choisir2",
-                                    numMaitreDe: "0"
-                                        })  
-                                }
-
-                  })
-               })
-
+            }
 
             })  
 
@@ -402,7 +377,7 @@ componentWillReceiveProps(newProps) {
 
 
   render() {
-if (this.props.numEtu==''){
+if (this.props.numEtu=='' || this.state.error){
   return (
   <MDBContainer>
       <MDBAlert color="warning" dismiss>
@@ -422,7 +397,7 @@ else
     
             <div className="Sujet">
               <label htmlFor="Sujet">Sujet:</label>
-                <select className="browser-default custom-select" value={this.state.value} onChange={this.handleStagesChange} >
+                <select className="browser-default custom-select" value={this.state.numIDStage} onChange={this.handleStagesChange} >
                 {this.state.stages.map((stage,index) =>(
                     this.props.choixdes ==stage.DES ?
                   <option key={stage.id} value={stage.id}>{stage.sujet}</option>
@@ -453,18 +428,25 @@ else
 <div style={{textAlign: "center"}}> 
 
       <MDBBtnGroup >
-        <MDBBtn color="grey lighten-5"   outline={this.state.choixlieu == 1 ? true  : false}  onClick={ ()=>this.toggleDiv(1) } >Maitres De Stage</MDBBtn>
-        <MDBBtn color="grey lighten-5"    outline={this.state.choixlieu == 0 ? true  : false}  onClick={ ()=>this.toggleDiv(0) } >Terrain De Stage</MDBBtn>
+        <MDBBtn color="grey lighten-5"
+             outline={this.state.isLieu == "0" ? true  : false}
+             onClick={ () => this.switchIsLieu("0") }
+             >Maitres De Stage</MDBBtn>
+        <MDBBtn 
+              color="grey lighten-5"    
+              outline={this.state.isLieu == "1" ? true  : false}  
+              onClick={ () => this.switchIsLieu("1") } 
+              >Terrain De Stage</MDBBtn>
        
       </MDBBtnGroup>
 </div> 
-      {  this.state.show && this.state.choixlieu ==this.state.isLieu ?
+      {   this.state.isLieu =="1" ?
  
       
           <div className="Terrain">
               <label htmlFor="Terrain">Terrain de stage hospitalier:</label>
 
-              <select className="browser-default custom-select" value1={this.state.value1} onChange={this.handleTerrainChange} >
+              <select className="browser-default custom-select" numLieuStage={this.state.numLieuStage} onChange={this.handleTerrainChange} >
                 {this.state.Terrains.map((terrain,index) =>(
                     
                   <option key={terrain.idterrain} value={terrain.idterrain}>{terrain.nom}</option>
@@ -485,7 +467,7 @@ else
 
                 <Select 
                   placeholder="Choisir Maitre de stage universitaire 1"
-                  value={this.state.numMaitreDeStageSelection}
+                  value={this.state.numEncadrant1Selection}
                   onChange={this.handleMaitreDeStageChange}
                   options={this.state.TuteursOptions}
                 />
@@ -497,7 +479,7 @@ else
 
                 <Select 
                   placeholder="Choisir Maitre de stage universitaire 2"
-                  value={this.state.numMaitreDeSelection}
+                  value={this.state.numEncadrant2Selection}
                   onChange={this.handleMaitreDeChange}
                   options={this.state.TuteursOptions}
                 />

@@ -1,7 +1,7 @@
 import React , { Component } from 'react';
 import logo from './logo.svg';
 
-import { Radar,Bar} from 'react-chartjs-2';
+import { Radar,Line} from 'react-chartjs-2';
 import { MDBContainer, MDBAlert} from 'mdbreact';
 
 import { BrowserRouter as Router } from 'react-router-dom';
@@ -29,7 +29,7 @@ constructor(props){
             legend: {
               display: true,
               labels: {
-                  fontSize: 20
+                  fontSize: this.props.isMobile ? 0 : 20,
               }
             }
           },
@@ -119,17 +119,7 @@ getInformation = (numEtu) => {
                     data: response.data.etudiant.Bilan3,
                     hidden : true
                   }
-                  , {
-                    label: 'Niveau Attendu 3',
-                    backgroundColor: 'rgba(140,140,140,0.2)',
-                    borderColor: 'rgba(140,140,140,0.2)',
-                    pointBackgroundColor: 'rgba(140,140,140,0.2)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgba(140,140,140,0.2)',
-                    data: response.data.model.Bilan3,
-                    hidden : true
-                  }
+                  
                 ]
               }
      
@@ -152,11 +142,33 @@ var warning="";
             </MDBAlert>
           </MDBContainer>);
        }
-
+var options = {
+                    maintainAspectRatio: true,
+                    scale: {
+                      ticks: {
+                        beginAtZero: true,
+                        max: 100,
+                        min: 0,
+                        stepSize: 10
+                    }
+                  }
+                  ,
+                  legend: {
+                    display: true,
+                    labels: {
+                        fontSize: 0,
+                    }
+                  }
+            }
   return (
           <div>
           {warning}
-     <Radar data={this.state.data} options={this.state.options} />
+          {this.props.isMobile?
+     <Radar options = {options }  
+          data={this.state.data} />
+            :
+     <Radar  data={this.state.data} options={this.state.options} />
+          }
      </div>
   );
   }

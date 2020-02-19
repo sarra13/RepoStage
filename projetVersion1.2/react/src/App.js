@@ -21,13 +21,16 @@ class App extends Component{
             isLoggedIn : session.login,
             isEtudiant : session.etudiant,
             userId : session.id,
-            isAdmin : session.isAdmin
+            isAdmin : session.isAdmin, 
+            token : session.token
             });
         localStorage.setItem('isLoggedIn', session.login);
         localStorage.setItem('isEtudiant', session.etudiant);
         localStorage.setItem('isAdmin', session.isAdmin);
         localStorage.setItem('userId', session.id);
-window.location.href = '/';  }
+        localStorage.setItem('token', session.token);
+        window.location.href = '/'; 
+       }
 
   componentDidMount(){
     if(localStorage.isLoggedIn=="true"){

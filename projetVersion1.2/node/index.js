@@ -3,6 +3,8 @@ var http = require("http");
 var path = require("path");
 var mysql = require('mysql');
 var cors = require('cors');
+var jwt = require('jsonwebtoken');
+const fs = require('fs')
 var port = 3001 ;
 
 var app = express();
@@ -14,9 +16,9 @@ app.use(cors());
 var con = mysql.createConnection({
   host: "localhost",
   user: "root",
+  password: "password",
   database: "testdb"
 });
-
 con.connect(function(err) {
   if (err) throw err;
   console.log("DB Connected!");
@@ -34,7 +36,9 @@ requette2 = "select * from professeurs where nom = "+mysql.escape(req.query.user
 			     	if (!Object.keys(result).length ){ // not found in admins
 			    		res.send({login : false});
 			     	}else{ // found in admins
-			    		res.send( {login : true ,etudiant : false , isAdmin : true , id : result[0].id });
+			     		var privateKey = fs.readFileSync('rsa.private');
+			    		var jwtToken = jwt.sign({login : true ,etudiant : false , isAdmin : true , id : result[0].id }, privateKey, { algorithm: 'RS256'});
+			    		res.send( {login : true ,etudiant : false , isAdmin : true , id : result[0].id , token : jwtToken});
 			     	}
 			     });
 	     	}else{ // found in teachers
@@ -58,19 +62,32 @@ app.get('/getDataSurEtudiant',(req,res)=>{
 	        and competence.id = `+req.query.competence+` 
 	        and competence.id = capaciteCommune.competence 
 	        and capaciteCommune.id = item.capaciteCommune
-	        and relationEtuItem.numEtudiant =`+req.query.numEtu
-
-	        ;
+	        and relationEtuItem.numEtudiant =`+req.query.numEtu;
 	  
 	  con.query(requette, function (err, result, fields) {
 	    if (err) {
 	    	res.send(err);
-	    	console.log("error occured");
+	    	console.log("error occured in /getDataSurEtudiant");
 	    }
-	    res.send(result);
+	    else
+	    	res.send(result);
 	  });
 });
 
+app.get('/getTimeOfLastChange',(req,res)=>{
+
+	  	requette = `SELECT DATE_FORMAT(relationEtuItem.dateModifBilan`+req.query.bilan+`,"%d/%m/%Y à %T") as time
+		FROM relationEtuItem where id=`+req.query.id;
+	  console.log(requette)
+	  con.query(requette, function (err, result, fields) {
+	    if (err) {
+	    	res.send(err);
+	    	console.log("error occured in /getTimeOfLastChange");
+	    }
+	    else
+	    	res.send(result[0]);
+	  });
+});
 app.get('/getMoyenneEtudiant',(req,res)=>{
 	
 
@@ -98,7 +115,7 @@ app.get('/getMoyenneEtudiant',(req,res)=>{
 		con.query(requette, function (err, result, fields) {
 			if (err) {
 				res.send(err);
-				console.log("error occured");
+				console.log("error occured in getMoyenneEtudiant (1)");
 			}
 			let newObj = {Bilan1: [] ,Bilan2 : [], Bilan3 : []};
 
@@ -113,7 +130,7 @@ app.get('/getMoyenneEtudiant',(req,res)=>{
 			con.query(requetteModel, function (err, result, fields) {
 					if (err) {
 						res.send(err);
-						console.log("error occured");
+						console.log("error occured getMoyenneEtudiant (2)");
 					}
 					let newObjModel = {Bilan1: [] ,Bilan2 : [], Bilan3 : []};
 
@@ -141,7 +158,7 @@ app.get('/getCapaciteCommune',(req,res)=>{
 	con.query(requette, function (err, result, fields) {
 	if (err) {
 		res.send(err);
-		console.log("error occured");
+		console.log("error occured in getCapaciteCommune");
 	}
 	newObj=[]
 	for ( i in result){
@@ -152,10 +169,29 @@ app.get('/getCapaciteCommune',(req,res)=>{
 
 });
 
+app.get('/verifyAdminPrivelege',(req,res)=>{
 
+		var admin = false ;
+		var cert = fs.readFileSync('rsa.public');
+		jwt.verify(req.headers.authorization, cert, function(err, decoded) {
+			if(!err){
+					  		if(decoded.isAdmin)
+					  		 {
+					  		 	admin=true;
+					  		}
+					 }else {
+					 	console.log("error in verifyAdminPrivelege");
+					 }
+
+			});	
+			res.send({isAdmin : admin});
+	
+});
 app.get('/getEtudiantsPourEnseignant',(req,res)=>{
 
-	if(req.query.admin=="admin")
+	
+	
+	if(req.query.admin=="admin" )
 		{
 			requette = `SELECT  id as value ,nom as label FROM etudiant where 1`;
 		}	
@@ -174,34 +210,78 @@ app.get('/getEtudiantsPourEnseignant',(req,res)=>{
 
 });
 
+
 app.get('/ajoutEtudiant',(req,res)=>{
 
-	
-			requette = "INSERT INTO `etudiant`(`id`, `nom`, `motDePasse`, `idTuteur`, `idMaitreDeStage`, `verrouillage`) VALUES (NULL,'"+req.query.username+"','"+req.query.password+"','"+req.query.numTuteur+"',1,0)";
-	
-	con.query(requette, function (err, result, fields) {
-	if (err) {
-		res.send(err);
-		console.log("error in ajoutEtudiant");
-	}else{
-		res.send("success");
+		var auth = false ;
+		var cert = fs.readFileSync('rsa.public');
+		jwt.verify(req.headers.authorization, cert, function(err, decoded) {
+			if(!err){
+			  		if(decoded.isAdmin)
+			  		{
+			  		 	auth=true;
+			  		}
+			 }
+		});	
+		if (auth){
+		requette = "INSERT INTO `etudiant`(`id`, `nom`, `motDePasse`, `idTuteur`, `verrouillage`) VALUES (NULL,'"+req.query.username+"','"+req.query.password+"',"+req.query.numTuteur+",0)";
+			con.query(requette, function (err, result, fields) {
+			if (err) {
+				res.send({msg:"error"});
+				console.log(err);
+				console.log("error in ajoutEtudiant");
+			}else{
+				res.send({msg : "etudiant ajouté"});
+			}
+			});
+		}else {
+			 res.status(403).send({msg : "403 Forbidden"})
+		}
 	}
-	});
+);
 
-});
+app.get('/ajoutEnseignant',(req,res)=>{
+
+		var auth = false ;
+		var cert = fs.readFileSync('rsa.public');
+		jwt.verify(req.headers.authorization, cert, function(err, decoded) {
+			if(!err){
+			  		if(decoded.isAdmin)
+			  		{
+			  		 	auth=true;
+			  		}
+			 }
+		});	
+		if (auth){
+		requette = "INSERT INTO `professeurs`(`id`, `nom`, `motDePasse`) VALUES (NULL,'"+req.query.usernameTuteur+"','"+req.query.passwordTuteur+"')";
+			con.query(requette, function (err, result, fields) {
+			if (err) {
+				res.send({msg:"error"});
+				console.log(err);
+				console.log("error in ajoutEnseignant");
+			}else{
+				res.send({msg : "Enseignant ajouté"});
+			}
+			});
+		}else {
+			 res.status(403).send({msg : "403 Forbidden"})
+		}
+	}
+);
 app.get('/getAllTuteurs',(req,res)=>{
 
-	 requette = `SELECT  id as value ,nom as label FROM professeurs where 1`;
 	
-	con.query(requette, function (err, result, fields) {
-	if (err) {
-		res.send(err);
-		console.log("error in getAllTuteurs");
-	}else{
-		res.send(result);
-	}
-	});
 
+				requette = `SELECT  id as value ,nom as label FROM professeurs where 1`;
+				con.query(requette, function (err, result, fields) {
+				if (err) {
+					res.send(err);
+					console.log("error in getAllTuteurs");
+				}else{
+					res.send(result);
+				}
+				});
+	
 });
 app.get('/isTuteurPourEtudiant',(req,res)=>{
 
@@ -210,7 +290,7 @@ app.get('/isTuteurPourEtudiant',(req,res)=>{
 	con.query(requette, function (err, result, fields) {
 	if (err) {
 		res.send(err);
-		console.log("error occured");
+		console.log("error occured in isTuteurPourEtudiant");
 	}
 	if (!Object.keys(result).length ){
 		res.send({isTuteur : "false"});
@@ -231,10 +311,10 @@ app.get('/isVerrouille',(req,res)=>{
 	con.query(requette, function (err, result, fields) {
 	if (err) {
 		res.send(err);
-		console.log("error occured");
+		console.log("error occured in /isVerrouille");
 	
 	}
-	if (!Object.keys(result).length ){
+	else if (!Object.keys(result).length ){
 		res.send({error : "true"});
 	}else {		
 		const verrouillage=result[0].verrouillage;
@@ -248,11 +328,10 @@ app.get('/isVerrouille',(req,res)=>{
 app.get('/VerrouillerCompetencecsEtudiant',(req,res)=>{
 
 	requette = ` UPDATE etudiant SET verrouillage =`+req.query.etat+` where  id = `+req.query.id+`;  `;
-	console.log(requette);
 	con.query(requette, function (err, result, fields) {
 		if (err) {
 			res.send(err);
-			console.log("error occured");
+			console.log("error occured in VerrouillerCompetencecsEtudiant");
 		}
 
 	});
@@ -261,18 +340,26 @@ app.get('/VerrouillerCompetencecsEtudiant',(req,res)=>{
 
 app.get('/updateItemEtu',(req,res)=>{
 
+	requette2 = ` select * from relationEtuItem where relationEtuItem.id = `+req.query.id+`;  `;
+	con.query(requette2, function (err2, result2, fields2) {
+		if(req.query.bilan1 != result2[0].bilan1){
+			con.query("UPDATE `relationEtuItem` SET `dateModifBilan1`= NOW() WHERE id="+req.query.id+";")
+		}
+		if(req.query.bilan2 != result2[0].bilan2){
+			con.query("UPDATE `relationEtuItem` SET `dateModifBilan2`= NOW() WHERE id="+req.query.id+";")
+		}
+		if(req.query.bilan3 != result2[0].bilan3){
+			con.query("UPDATE `relationEtuItem` SET `dateModifBilan3`= NOW() WHERE id="+req.query.id+";")
+		}
+	});
 	requette = ` UPDATE relationEtuItem SET bilan1 = '`+req.query.bilan1+`' , bilan2 = '`+req.query.bilan2+`' , bilan3 = '`+req.query.bilan3+`' WHERE relationEtuItem.id = `+req.query.id+`;  `;
-	console.log(requette);
 	con.query(requette, function (err, result, fields) {
 	if (err) {
 		res.send(err);
-		console.log("error occured");
+		console.log("error occured in updateItemEtu");
 	}
 
-	requette2 = ` select * from relationEtuItem where relationEtuItem.id = `+req.query.id+`;  `;
-	con.query(requette2, function (err2, result2, fields2) {
-		res.send(result2);
-	});
+
 
 	});
 
@@ -288,7 +375,6 @@ app.get('/stages/getDataSurStageEtudiant',(req,res)=>{
 	  and relationetudiantstages.numetu =`+req.query.numetu;
 
 	  
-	  console.log(requette);
 	  
 
 con.query(requette, function (err, result, fields) {
@@ -315,24 +401,27 @@ con.query(requette, function (err, result, fields) {
 
 app.get('/stages/updateStagePourEtudiant',(req,res)=>{
 
-	requette = ` UPDATE relationetudiantstages SET numIDStage= `+req.query.numIDStage+`,nomResponsable = '`+req.query.nomResponsable+`',isLieu = '`+req.query.isLieu+`',lieu = '`+req.query.lieu+`' ,datedebut = '`+req.query.datedebut+`' , datefin = '`+req.query.datefin+`' 
+if(req.query.isLieu=="1"){
+	requette = `UPDATE relationetudiantstages SET numIDStage= `+req.query.numIDStage+`,nomResponsable = '`+req.query.nomResponsable+`',isLieu = '`+req.query.isLieu+`',lieu = '`+req.query.lieu+`' ,datedebut = '`+req.query.datedebut+`' , datefin = '`+req.query.datefin+`' 
 	WHERE relationetudiantstages.Semestre = `+req.query.Semestre+`
 	and relationetudiantstages.DES = `+req.query.DES+`
-	  and relationetudiantstages.numetu =`+req.query.numetu  ;
+	  and relationetudiantstages.numetu =`+req.query.numetu  ;	
+}else {
+	requette = `UPDATE relationetudiantstages SET numIDStage= `+req.query.numIDStage+`,nomResponsable = '`+req.query.nomResponsable+`',isLieu = '`+req.query.isLieu+`',lieu = '`+req.query.encadrant1+" "+req.query.encadrant2+`' ,datedebut = '`+req.query.datedebut+`' , datefin = '`+req.query.datefin+`' 
+	WHERE relationetudiantstages.Semestre = `+req.query.Semestre+`
+	and relationetudiantstages.DES = `+req.query.DES+`
+	  and relationetudiantstages.numetu =`+req.query.numetu  ;		
+}
 
-	console.log(requette);
 	con.query(requette, function (err, result, fields) {
 	if (err) {
 		res.send(err);
-		console.log("error occured");
+		console.log("error occured in /stages/updateStagePourEtudiant");
+	}else {
+		res.send("ok");	
 	}
 
-	requette2 = ` select * from relationetudiantstages where relationetudiantstages.Semestre = `+req.query.Semestre+`
-	and relationetudiantstages.DES = `+req.query.DES+`
-	  and relationetudiantstages.numetu =`+req.query.numetu ;
-	con.query(requette2, function (err2, result2, fields2) {
-		res.send(result2);
-	});
+
 
 	});
 });
@@ -342,13 +431,12 @@ app.get('/etudiant/getInformationsEtudiant',(req,res)=>{
   FROM etudiant
 	  WHERE etudiant.id=`+req.query.id;
 	  
-	  console.log(requette);
 	  
 
 	con.query(requette, function (err, result, fields) {
 		if (err) {
 			res.send(err);
-			console.log("error occured");
+			console.log("error occured in /etudiant/getInformationsEtudiant");
 		}
 	  res.send(result);
 	});
